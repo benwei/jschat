@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Tahoma, Geneva, sans-serif;
+      }
+
+      div {
+        display: inline;
+      }
+    </style>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script>
+      function updateStats(blob) {
+	      document.getElementById('chat').innerHTML += blob.sender + ":" + blob.data + "<br>";
+	      var height = $('body').height();
+	      $('body').scrollTop(height);
+      }
+
+      var host = window.document.location.host.replace(/:.*/, '');
+      var ws = new WebSocket('ws://' + host + ':8009');
+      ws.onmessage = function (event) {
+        updateStats(JSON.parse(event.data));
+};
+    </script>
+    <script type = "text/javascript">
+    // Define the entry point
+    $(document).ready(function()
+    {
+	    // The DOM (document object model) is constructed
+	    // We will initialize and run our plugin here
+    });
+    </script>
+    </head>
+    <body>
+	    <strong>Lan Chat Server</strong><br>
+	    <div id='chat'></div><br>
+    </body>
+			    </html>
