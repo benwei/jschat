@@ -7,9 +7,12 @@
 
 # support commands by server
 
-Commands json syntax:
- Register:
+ Commands json syntax:
+
+## Register
+
  { "cmd": "register", "data": "mclient v0.1", "sender": "your chat name"}
 
-Send Message:
+## Send Text Message
+
  { "data": "your message", "sender": "your chat name"}
