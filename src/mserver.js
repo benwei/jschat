@@ -80,17 +80,15 @@ wss.on('connection', function(ws) {
 
         for (var i=0; i < clients.length ; i++) {
             var c = clients[i];
-            if (c.ws != mws) {
-                var blob;
-                if (cur.hasOwnProperty('sender')) {
-                    blob = {sender: cur.sender, data: message};
-                } else if (sender) {
-                    blob = {sender: sender, data: message};
-                } else {
-                    blob = {sender: 'guest', data: message};
-                }
-                c.ws.send(JSON.stringify(blob));
+            var blob;
+            if (cur.hasOwnProperty('sender')) {
+                blob = {sender: cur.sender, data: message};
+            } else if (sender) {
+                blob = {sender: sender, data: message};
+            } else {
+                blob = {sender: 'guest', data: message};
             }
+            c.ws.send(JSON.stringify(blob));
         }
     });
 
