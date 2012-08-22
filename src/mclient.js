@@ -1,19 +1,29 @@
 // reference from https://github.com/einaros/ws
 var WebSocket = require('ws');
-var ws = new WebSocket('ws://localhost:8009/path');
+// var ws = new WebSocket('ws://192.168.1.185:8009');
 
 var stdin = process.openStdin();
 
 var messages = [];
 
 var sender = 'guest';
+var host = 'localhost';
+
 if (process.argv.length > 2)
     sender = process.argv[2];
 
-var banner= '{ "cmd": "register", "data": "mclient v0.1", "sender": "' + sender + '"}';
+if (process.argv.length > 3)
+    host = process.argv[3];
+
+var url = 'ws://' + host + ':8009';
+console.log("connect to " + url);
+var ws = new WebSocket(url);
+
+var banner= { cmd: "register", data: "mclient v0.1", sender: sender };
 
 ws.on('open', function() {
-    ws.send(banner);
+    ws.send(JSON.stringify(banner));
+
     setInterval(function () {
         if (messages.length > 0) {
             for (var i = 0; i < messages.length ; i++)
@@ -21,6 +31,10 @@ ws.on('open', function() {
             messages = [];
         }
     }, 100);
+});
+
+ws.on('close', function() {
+    console.log("disconnected.");
 });
 
 ws.on('message', function(data, flags) {
@@ -40,7 +54,6 @@ ws.on('message', function(data, flags) {
     } else {
         console.log("> " + data);
     }
-    //ws.teminate();
 });
 
 stdin.on('data', function(chunk) {
