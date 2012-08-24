@@ -13,6 +13,15 @@
 
  { "cmd": "register", "data": "mclient v0.1", "sender": "your chat name"}
 
+## Who
+  type "/who"
+ { "cmd": "who", args: "" };
+
 ## Send Text Message
 
  { "data": "your message", "sender": "your chat name"}
+
+## close all client
+
+   while you type CTRL+C on server, it will disconnect all client.
+

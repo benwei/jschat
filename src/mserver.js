@@ -4,14 +4,6 @@ var http = require('http');
 var express = require('express');
 var app = express();
 
-app.use(express.static(__dirname + '/public'));
-
-var server_port = 8009;
-
-var server = http.createServer(app);
-server.listen(server_port);
-
-var wss = new WebSocketServer({server: server});
 
 Array.prototype.remove= function(){
     var what, a= arguments, L= a.length, ax;
@@ -81,9 +73,25 @@ function cmd_who (user, obj, message) {
 }
 
 var user_commander = {
-    who: cmd_who,
-    register: cmd_register };
+who: cmd_who,
+register: cmd_register
+};
 
+
+var server_port = 8009;
+
+if (process.argv.length >=3)
+server_port = process.argv[2];
+
+function ChatServer () {
+
+    app.use(express.static(__dirname + '/public'));
+
+
+    var server = http.createServer(app);
+    server.listen(server_port);
+
+    var wss = new WebSocketServer({server: server});
 
     wss.on('connection', function(ws) {
         num++;
@@ -170,4 +178,42 @@ var user_commander = {
         console.log("conn num: " + clients.length);
     });
 
+    this.send = function(data, flags) {
+        var sender = 'server'
+        try {
+            for (var i=0; i < clients.length ; i++) {
+                var c = clients[i];
+                var blob = {sender: sender, data: message};
+                c.ws.send(JSON.stringify(blob));
+            }
+        } catch(e) {
+            console.log("err");
+        }
+    };
+
+    this.closeAll = function(data, flags) {
+        var sender = 'server'
+        try {
+            for (var i=0; i < clients.length ; i++) {
+                var c = clients[i];
+                c.ws.close(3000, "chat v1 info closing...");
+            }
+        } catch(e) {
+            console.log("err");
+        }
+    };
+
     console.log("jschat server listen on " +  server_port + "...");
+};
+
+var chat_server = new ChatServer();
+
+process.on('uncaughtException', function (err) {
+    console.log('Server Error Caught exception: ' + err);
+});
+
+
+process.on('SIGINT', function () {
+    console.log('Got SIGINT.  Press Control-D to exit.');
+    chat_server.closeAll();
+});
