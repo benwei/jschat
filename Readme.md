@@ -2,8 +2,18 @@
   This is a prototype for chat server written by nodejs.
 
 # Get started
-  node src/mserver.js
-  node src/mclient.js
+## install
+
+  cd src
+
+  npm install
+
+## run server
+  
+  node src/mserver.js [port]
+
+## run client
+  node src/mclient.js [nickname] [host:port] 
 
 # support commands by server
 
