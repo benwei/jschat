@@ -84,7 +84,11 @@ if (process.argv.length > 2)
 if (process.argv.length > 3)
     host = process.argv[3];
 
-var url = 'ws://' + host + ':8009';
+
+var url = 'ws://' + host
+if (host.indexOf(':') < 0)
+ url += ':8009';
+
 var wsclient = new ChatClient(url);
 
 stdin.on('data', function(chunk) {
