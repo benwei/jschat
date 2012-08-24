@@ -53,8 +53,8 @@ function ChatClient(wsurl) {
     }
 
     ws.on('close', function(code, data) {
-        ws.terminate();
         console.log("disconnected." + code + ":" + data);
+        ws.terminate();
         process.exit(0);
     });
 
