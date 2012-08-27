@@ -22,8 +22,8 @@
       var retry_interval = 5;
 
       function start_wsserver() {
-	      var host = window.document.location.host.replace(/:.*/, '');
-	      var ws = new WebSocket('ws://' + host + ':8009');
+	      var host = window.document.location.host.replace(/^http:\/\//, '');
+	      var ws = new WebSocket('ws://' + host);
 	      ws.onmessage = function (event) {
 		      if (timer_reconnect) {
 			      clearInterval(timer_reconnect);
