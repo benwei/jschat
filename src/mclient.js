@@ -9,7 +9,7 @@ var host = 'localhost';
 
 function ChatClient(wsurl) {
     var self = this;
-    var ws = new WebSocket(wsurl);
+    var ws = new WebSocket(wsurl, {protocolVersion: 8});
     console.log("connecting to " + wsurl);
 
     var banner= { cmd: "register", data: "mclient v0.1", sender: sender };

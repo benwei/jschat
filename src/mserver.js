@@ -2,6 +2,7 @@
 var WebSocketServer = require('ws').Server;
 var http = require('http');
 var express = require('express');
+var util = require('util');
 var app = express();
 
 
@@ -117,11 +118,28 @@ function cmd_who (user, obj, message) {
     return WSC_CMD_NO_BROADCAST;
 }
 
-var user_commander = {
-msg: cmd_msg_to,
-who: cmd_who,
-register: cmd_register
+var user_commander;
+
+var cmd_help = function (user) {
+    var helper = '';
+    for (var k in user_commander) {
+        var desc = user_commander[k][1];
+        if (desc)
+            helper+= k + ": " + desc + "\n"
+    }
+    var msg = {sender: 'system', data:helper};
+    user.ws.send(JSON.stringify(msg));
+    return WSC_CMD_NO_BROADCAST;
+}
+
+user_commander = {
+msg: [cmd_msg_to, 'send message to specific user'],
+who: [cmd_who, 'list who online'],
+register: [cmd_register, null], //'register user identity'],
+help: [cmd_help, 'command helper']
 };
+
+
 
 
 var server_port = 8009;
@@ -132,7 +150,10 @@ server_port = process.argv[2];
 function ChatServer () {
 
     app.use(express.static(__dirname + '/public'));
-
+    app.use(function (req, res, next) {
+        console.log(req.url);
+        next();
+    });
 
     var server = http.createServer(app);
     server.listen(server_port);
@@ -141,6 +162,7 @@ function ChatServer () {
 
     wss.on('connection', function(ws) {
         num++;
+
         clients.push({ws: ws, id:num,
             msgcount: 0,
             perm: WSC_PERM_GUEST,
@@ -174,7 +196,7 @@ function ChatServer () {
             if (user) {
                 var pf = user_commander[cmd];
                 if (pf) {
-                    var ret = pf(user, obj, message);
+                    var ret = pf[0](user, obj, message);
                     // no broadcast if ret is zero
                     if (ret == 0) return;
                 } else if (cmd) {
