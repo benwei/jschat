@@ -29,6 +29,16 @@ function findCurrentSender(ws) {
     return null;
 }
 
+function findUserByID(id) {
+    for (var i=0; i < clients.length ; i++) {
+        var c = clients[i];
+        if (c.id == id) {
+            return c;
+        }
+    }
+    return null;
+}
+
 var WSC_PERM_ADMIN = 0,
 WSC_PERM_USER = 1,
 WSC_PERM_GUEST = 2;
@@ -36,6 +46,8 @@ WSC_PERM_GUEST = 2;
 var WSC_STAT_CONNECTED = 1,
 WSC_STAT_TERMINATE = 2;
 
+var WSC_CMD_NO_BROADCAST = 0,
+WSC_CMD_BROADCAST = 1;
 
 function cmd_register(user, obj, message) {
     try {
@@ -46,7 +58,40 @@ function cmd_register(user, obj, message) {
         console.log('r%d(%s): %s', user.id, user.sender, message);
     else
         console.log('r%d: %s', user.id, message);
-    return 0;
+    return WSC_CMD_NO_BROADCAST;
+}
+
+function compose_message_blob(sender, message) {
+        return JSON.stringify({sender: sender, data: message});
+}
+
+function cmd_msg_to(user, obj, message) {
+    var target_id = '';
+    if (obj.hasOwnProperty('target_id')) {
+        target_id = obj['target_id'];
+    } else {
+        var i = message.indexOf(' ');
+        if (i > 0) {
+            target_id = message.substring(0, i);
+            message = message.slice(i+1);
+            console.log('target_id:' + target_id);
+            console.log('target_msg:' + message);
+        } else {
+            var msg = compose_message_blob(user.sender, "syntax: /msg <id> <message string>");
+        user.ws.send(msg);
+            return WSC_CMD_NO_BROADCAST;
+        }
+    }
+
+    target = findUserByID(target_id);
+    if (target) {
+        var msg = compose_message_blob(user.sender, message);
+        target.ws.send(msg);
+    } else {
+        var msg = compose_message_blob(user.sender, "target user not found");
+        user.ws.send(msg);
+    }
+    return WSC_CMD_NO_BROADCAST;
 }
 
 function cmd_who (user, obj, message) {
@@ -69,10 +114,11 @@ function cmd_who (user, obj, message) {
             console.log("error: "  + e);
         }
     }
-    return 0;
+    return WSC_CMD_NO_BROADCAST;
 }
 
 var user_commander = {
+msg: cmd_msg_to,
 who: cmd_who,
 register: cmd_register
 };
