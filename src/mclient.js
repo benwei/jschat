@@ -21,7 +21,7 @@ function ChatClient(wsurl) {
 
     this.cmdfunc = function (cmd, args) {
         try {
-            var blob = JSON.stringify({cmd: cmd, data: ''});
+            var blob = JSON.stringify({cmd: cmd, data: args});
 //            console.log(blob);
             ws.send(blob);
         } catch (e) {
@@ -37,7 +37,7 @@ function ChatClient(wsurl) {
                 var cmd;
                 var args= '';
                 if (i > 1) {
-                    cmd = str.substring(1, i-1);
+                    cmd = str.substring(1, i);
                     args = str.slice(i+1);
                 } else if (str.length > 3) {
                     cmd = str.substring(1, str.length);
