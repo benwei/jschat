@@ -214,6 +214,6 @@ process.on('uncaughtException', function (err) {
 
 
 process.on('SIGINT', function () {
-    console.log('Got SIGINT.  Press Control-D to exit.');
+    console.log('Got SIGINT. Close all clients.');
     chat_server.closeAll();
 });
