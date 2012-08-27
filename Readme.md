@@ -21,17 +21,28 @@
 
 ## Register
 
- { "cmd": "register", "data": "mclient v0.1", "sender": "your chat name"}
+ `{ "cmd": "register", "data": "mclient v0.1", "sender": "your chat name"}`
 
 ## Who
   type "/who"
- { "cmd": "who", args: "" };
+ `{ "cmd": "who", args: "" }`
 
 ## Send Text Message
 
- { "data": "your message", "sender": "your chat name"}
+ `{ "data": "your message", "sender": "your chat name"}`
+
+ Once your client has registered by Register command, the sender field won't be reference anymore.
+
+## Send Text Message to specific user id
+ 
+ `{ "cmd": "msg", "data": "your message", "target_id": "id number"}`
+
+ if you don't assign target_id, you can compose them in data field.
+
+ ex:
+ `{ "cmd": "msg", "data": "2 your meesage"}`
 
 ## close all client
 
-   while you type CTRL+C on server, it will disconnect all client.
+  while you type CTRL+C on server, server will disconnect all client.
 
