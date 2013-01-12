@@ -1,10 +1,18 @@
 
-var WebSocketServer = require('ws').Server;
-var http = require('http');
-var express = require('express');
-var util = require('util');
-var app = express();
+var WebSocketServer = require('ws').Server,
+http = require('http'),
+nconf= require('nconf'),
+util = require('util'),
+express = require('express'),
+app = express();
 
+nconf.file({file: __dirname + '/config.json'});
+var default_port_num = 8009;
+
+var port_num = nconf.get("port");
+if (!port_num) {
+	port_num = default_port_num;
+}
 
 Array.prototype.remove= function(){
     var what, a= arguments, L= a.length, ax;
@@ -142,7 +150,7 @@ help: [cmd_help, 'command helper']
 
 
 
-var server_port = 8009;
+var server_port = port_num;
 
 if (process.argv.length >=3)
 server_port = process.argv[2];
@@ -246,7 +254,8 @@ function ChatServer () {
         console.log("conn num: " + clients.length);
     });
 
-    this.send = function(data, flags) {
+    var self = this;
+    self.send = function(data, flags) {
         var sender = 'server'
         try {
             for (var i=0; i < clients.length ; i++) {
@@ -259,7 +268,9 @@ function ChatServer () {
         }
     };
 
-    this.closeAll = function(data, flags) {
+    self.shutdown = false;
+    self.closeAll = function(data, flags) {
+	self.shutdown = true;
         var sender = 'server'
         try {
             for (var i=0; i < clients.length ; i++) {
@@ -269,6 +280,11 @@ function ChatServer () {
         } catch(e) {
             console.log("err");
         }
+
+	setTimeout(function () {
+    		console.log('server stopped.');
+		process.exit(0);
+	}, 1000);
     };
 
     console.log("jschat server listen on " +  server_port + "...");
@@ -282,6 +298,10 @@ process.on('uncaughtException', function (err) {
 
 
 process.on('SIGINT', function () {
+    if (chat_server.shutdown) {
+    	console.log('server stopping...');
+	return;
+    }
     console.log('Got SIGINT. Close all clients.');
     chat_server.closeAll();
 });

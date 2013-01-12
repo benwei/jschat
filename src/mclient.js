@@ -1,9 +1,16 @@
 // reference from https://github.com/einaros/ws
-var WebSocket = require('ws');
-// var ws = new WebSocket('ws://192.168.1.185:8009');
+var WebSocket = require('ws'),
+nconf= require('nconf');
+
+nconf.file({file: __dirname + '/config.json'});
+
+var default_port_num = 8009;
+var port_num = nconf.get("port");
+if (!port_num) {
+	port_num = default_port_num;
+}
 
 var stdin = process.openStdin();
-
 var sender = 'guest';
 var host = 'localhost';
 
@@ -22,7 +29,6 @@ function ChatClient(wsurl) {
     this.cmdfunc = function (cmd, args) {
         try {
             var blob = JSON.stringify({cmd: cmd, data: args});
-//            console.log(blob);
             ws.send(blob);
         } catch (e) {
             console.log(e);
@@ -87,7 +93,7 @@ if (process.argv.length > 3)
 
 var url = 'ws://' + host
 if (host.indexOf(':') < 0)
- url += ':8009';
+ url += ':' + port_num;
 
 var wsclient = new ChatClient(url);
 
