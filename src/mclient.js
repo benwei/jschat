@@ -105,6 +105,10 @@ function ChatClient(wsurl) {
             console.log("> " + data);
         }
     });
+
+    this.close = function () {
+        ws.close();
+    };
 };
 
 if (process.argv.length > 2)
@@ -124,6 +128,9 @@ stdin.on('data', function(chunk) {
     //console.log("Got chunk: " + chunk); }
     var data = chunk.slice(0, chunk.length - 1);
     if (data.length > 0) {
-        wsclient.send(data);
+        if (data == '/quit') {
+            wsclient.close();
+        } else
+            wsclient.send(data);
     }
 });
