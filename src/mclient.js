@@ -60,10 +60,10 @@ function ChatClient(wsurl) {
 
     this.send = function (data) {
         try {
+            var cmd = '';
+            var str = data.toString();
             if (data[0] == 47) {
-                var str = data.toString();
                 var i = str.indexOf(' ');
-                var cmd;
                 var args= '';
                 if (i > 1) {
                     cmd = str.substring(1, i);
@@ -71,10 +71,12 @@ function ChatClient(wsurl) {
                 } else if (str.length > 3) {
                     cmd = str.substring(1, str.length);
                 }
-                if (cmd)
-                    self.cmdfunc(cmd, args);
+            }
+
+            if (cmd) {
+                self.cmdfunc(cmd, args);
             } else {
-                ws.send(data)
+                ws.send(str);
             }
         } catch (e) {
             console.log("send error:" + e);
@@ -97,7 +99,10 @@ function ChatClient(wsurl) {
             obj = JSON.parse(data);
             sender = obj['sender'];
             message = obj['data'];
-        } catch (e) { };
+        } catch (e) {
+            console.log(e);
+            return;
+        };
 
         if (sender) {
             console.log(sender + "> " + message);
@@ -125,7 +130,7 @@ if (host.indexOf(':') < 0)
 var wsclient = new ChatClient(url);
 
 stdin.on('data', function(chunk) {
-    //console.log("Got chunk: " + chunk); }
+    // console.log("Got chunk: " + chunk); 
     var data = chunk.slice(0, chunk.length - 1);
     if (data.length > 0) {
         if (data == '/quit') {
