@@ -49,6 +49,10 @@ function ChatClient(wsurl) {
 
     });
 
+    ws.on('error', function(e) {
+        console.log(e);
+    });
+
     this.cmdfunc = function (cmd, args) {
         try {
             var blob = JSON.stringify({cmd: cmd, data: args});
@@ -100,8 +104,7 @@ function ChatClient(wsurl) {
             sender = obj['sender'];
             message = obj['data'];
         } catch (e) {
-            console.log(e);
-            return;
+            // eat it. treat as text message only
         };
 
         if (sender) {
@@ -116,16 +119,20 @@ function ChatClient(wsurl) {
     };
 };
 
-if (process.argv.length > 2)
+// main
+
+if (process.argv.length > 2) {
     sender = process.argv[2];
+}
 
-if (process.argv.length > 3)
+if (process.argv.length > 3) {
     host = process.argv[3];
+}
 
-
-var url = 'ws://' + host
-if (host.indexOf(':') < 0)
- url += ':' + port_num;
+var url = 'ws://' + host;
+if (host.indexOf(':') < 0) {
+    url += ':' + port_num;
+}
 
 var wsclient = new ChatClient(url);
 
@@ -135,7 +142,8 @@ stdin.on('data', function(chunk) {
     if (data.length > 0) {
         if (data == '/quit') {
             wsclient.close();
-        } else
+        } else {
             wsclient.send(data);
+        }
     }
 });
