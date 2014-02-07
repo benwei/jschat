@@ -39,7 +39,8 @@
 		      updateStats(obj);
 	      };
 	      ws.onerror = function (err) {
-		      updateStats({data:"err:" + err}); 
+		      console.log("ws error:" + JSON.stringify(err)); 
+              ws.close();
 	      };
 	      ws.onclose = function () {
 		      if (!timer_reconnect) {
