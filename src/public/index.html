@@ -20,7 +20,7 @@
 
       var timer_reconnect = null;
       var retry_interval = 5;
-
+      var verbose = 0;
       function start_wsserver() {
 	      var host = window.document.location.host.replace(/^http:\/\//, '');
 	      var ws = new WebSocket('ws://' + host);
@@ -28,7 +28,7 @@
 		      if (timer_reconnect) {
 			      clearInterval(timer_reconnect);
 			      timer_reconnect = null;
-			      updateStats({sender: 'info', data:"server connected."}); 
+			      updateStats({sender: 'Client', data:"Server connected."}); 
 		      }
 
 		      var obj;
@@ -44,8 +44,12 @@
 	      };
 	      ws.onclose = function () {
 		      if (!timer_reconnect) {
+                  verbose = 1;
 			      timer_reconnect = setInterval(function () {
-				      updateStats({sender: 'info', data:"reconnecting server within " + retry_interval + " seconds."}); 
+                    if (verbose) {
+                        verbose = 0;
+                        updateStats({sender: 'Client', data:"Server has been shutdown, reconnecting..."}); 
+                    }
 				      start_wsserver();
 			      }, retry_interval * 1000);
 		      }
