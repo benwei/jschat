@@ -12,10 +12,15 @@
     </style>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script>
+        var msg_pool = new Array();
+
       function updateStats(blob) {
-	      document.getElementById('chat').innerHTML += blob.sender + ":" + blob.data + "<br>";
-	      var height = $('body').height();
-	      $('body').scrollTop(height);
+	      var msg = blob.sender + ":" + blob.data + "<br>";
+          msg_pool.push(msg);
+          var chats = msg_pool.join("");
+          var height = $('body').height();
+          $('body').scrollTop(height);
+          $('#chat').html(chats);
       }
 
       var timer_reconnect = null;
@@ -62,8 +67,7 @@
 	    // Define the entry point
     $(document).ready(function()
     {
-	    // The DOM (document object model) is constructed
-	    // We will initialize and run our plugin here
+        updateStats({sender: 'System', data: "Welcome to jschat"});
     });
     </script>
     </head>
@@ -71,4 +75,4 @@
 	    <strong>Lan Chat Server</strong><br>
 	    <div id='chat'></div><br>
     </body>
-			    </html>
+</html>
