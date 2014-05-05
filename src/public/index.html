@@ -68,6 +68,7 @@
     {
     var tabox = $('#tabox');
     var msgbar=$('#msg');
+    var user = "guest";
     $('#sendmsg').click(
         function () {
            var boxtext = tabox.val()
@@ -79,7 +80,15 @@
                 return;
            }
            
-           var user = $('#username').val()
+           var blob = {sender: user, data:boxtext};
+           ws.send(JSON.stringify(blob)); 
+           });
+
+     $('#btnclear').click(function (){
+           tabox.val('');
+         });
+     $('#btnregister').click(function (){
+           user = $('#username').val()
            .replace(/>/g,'&gt;')
            .replace(/</g, '&lt;');
            if (user.length == 0) {
@@ -88,13 +97,9 @@
                 return;
            }
 
-           var blob = {sender: user, data:boxtext};
+           var blob = {sender: user, cmd:'register'};
            ws.send(JSON.stringify(blob)); 
            });
-
-     $('#btnclear').click(function (){
-           tabox.val('');
-         });
 
     updateStats({sender: 'System', data: "Welcome to jschat"});
     start_wsserver();
@@ -104,7 +109,7 @@
 <body>
 <strong>Lan Chat Server</strong><br/>
 <div id='panel'>
-<input type="textbox" id="username" value="" length=25 style="width:200px;"><br/>
+<input type="textbox" id="username" value="" length=25 style="width:200px;"><input type=button id="btnregister" value="Register"><br/>
 <textarea id='tabox' cols=80 rows="25" style="width:200px; height:100px;"></textarea></textarea>
 <input type=button id="sendmsg" value="Send">
 <input type=button id="btnclear" value="Clear"><br/>

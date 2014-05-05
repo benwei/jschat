@@ -97,6 +97,8 @@ function compose_message_blob(sender, message) {
         return JSON.stringify({sender: sender, data: message});
 }
 
+var cache_messages = [];
+
 function cmd_msg_to(user, obj, message) {
     var target_id = '';
     if (obj.hasOwnProperty('target_id')) {
@@ -110,7 +112,7 @@ function cmd_msg_to(user, obj, message) {
             console.log('target_msg:' + message);
         } else {
             var msg = compose_message_blob(user.sender, "syntax: /msg <id> <message string>");
-        user.ws.send(msg);
+            user.ws.send(msg);
             return WSC_CMD_NO_BROADCAST;
         }
     }
@@ -123,6 +125,7 @@ function cmd_msg_to(user, obj, message) {
         var msg = compose_message_blob(user.sender, "target user not found");
         user.ws.send(msg);
     }
+    cache_messages.push(msg);
     return WSC_CMD_NO_BROADCAST;
 }
 
@@ -149,7 +152,6 @@ function cmd_who (user, obj, message) {
     return WSC_CMD_NO_BROADCAST;
 }
 
-var user_commander;
 
 var cmd_help = function (user) {
     var helper = '';
@@ -163,7 +165,7 @@ var cmd_help = function (user) {
     return WSC_CMD_NO_BROADCAST;
 }
 
-user_commander = {
+var user_commander = {
 msg: [cmd_msg_to, 'send message to specific user'],
 who: [cmd_who, 'list who online'],
 register: [cmd_register, null], //'register user identity'],
@@ -238,6 +240,7 @@ function ChatServer () {
                 return;
             }
 
+            /* broadcast to all users */
             user.msgcount++;
             for (var i=0; i < clients.length ; i++) {
                 var c = clients[i];
@@ -249,7 +252,9 @@ function ChatServer () {
                 } else {
                     blob = {sender: 'guest', data: message};
                 }
-                c.ws.send(JSON.stringify(blob));
+                var msg = JSON.stringify(blob);
+                c.ws.send(msg);
+                cache_messages.push(msg);
             }
 
         });
@@ -272,39 +277,52 @@ function ChatServer () {
 
         ws.send('Connected to chat server');
         console.log("conn num: " + clients.length);
+
+        // while first login resend old messages in advance.
+        // FIXME: need to support get older message by paging
+        // FIXME:cache mechanism should have 
+        function restore_cache_messages() {
+            var limit_restore_cache_count = 100;
+            var cache_count = (cache_messages.length  > limit_restore_cache_count) ? limit_restore_cache_count : cache_messages.length; 
+            console.log("test: " + cache_count.toString());
+            for (var m=0; m <cache_count; m++) {
+                ws.send(cache_messages[m]);
+            }
+        }
+        restore_cache_messages();
     });
 
     var self = this;
     self.send = function(data, flags) {
         var sender = 'server'
-        try {
-            for (var i=0; i < clients.length ; i++) {
-                var c = clients[i];
-                var blob = {sender: sender, data: message};
-                c.ws.send(JSON.stringify(blob));
+            try {
+                for (var i=0; i < clients.length ; i++) {
+                    var c = clients[i];
+                    var blob = {sender: sender, data: message};
+                    c.ws.send(JSON.stringify(blob));
+                }
+            } catch(e) {
+                console.log("err");
             }
-        } catch(e) {
-            console.log("err");
-        }
     };
 
     self.shutdown = false;
     self.closeAll = function(data, flags) {
-	self.shutdown = true;
+        self.shutdown = true;
         var sender = 'server'
-        try {
-            for (var i=0; i < clients.length ; i++) {
-                var c = clients[i];
-                c.ws.close(3000, "chat v1 info closing...");
+            try {
+                for (var i=0; i < clients.length ; i++) {
+                    var c = clients[i];
+                    c.ws.close(3000, "chat v1 info closing...");
+                }
+            } catch(e) {
+                console.log("err");
             }
-        } catch(e) {
-            console.log("err");
-        }
 
-	setTimeout(function () {
-    		console.log('server stopped.');
-		process.exit(0);
-	}, 1000);
+        setTimeout(function () {
+                console.log('server stopped.');
+                process.exit(0);
+                }, 1000);
     };
 
     console.log("jschat server listen on " +  server_port + "...");
@@ -313,15 +331,15 @@ function ChatServer () {
 var chat_server = new ChatServer();
 
 process.on('uncaughtException', function (err) {
-    console.log('Server Error Caught exception: ' + err);
-});
+        console.log('Server Error Caught exception: ' + err);
+        });
 
 
 process.on('SIGINT', function () {
-    if (chat_server.shutdown) {
-    	console.log('server stopping...');
-	return;
-    }
-    console.log('Got SIGINT. Close all clients.');
-    chat_server.closeAll();
-});
+        if (chat_server.shutdown) {
+        console.log('server stopping...');
+        return;
+        }
+        console.log('Got SIGINT. Close all clients.');
+        chat_server.closeAll();
+        });
