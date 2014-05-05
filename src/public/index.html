@@ -90,8 +90,12 @@
 
            var blob = {sender: user, data:boxtext};
            ws.send(JSON.stringify(blob)); 
-           tabox.val('');
            });
+
+     $('#btnclear').click(function (){
+           tabox.val('');
+         });
+
     updateStats({sender: 'System', data: "Welcome to jschat"});
     start_wsserver();
     });
@@ -101,8 +105,9 @@
 <strong>Lan Chat Server</strong><br/>
 <div id='panel'>
 <input type="textbox" id="username" value="" length=25 style="width:200px;"><br/>
-<textarea id='tabox' cols=80 rows="25" style="width:200px; height:150px;" alt="mmm."></textarea>
-<input type=button id="sendmsg" value="Send"><br/>
+<textarea id='tabox' cols=80 rows="25" style="width:200px; height:100px;"></textarea></textarea>
+<input type=button id="sendmsg" value="Send">
+<input type=button id="btnclear" value="Clear"><br/>
 <div id=msg>...</div>
 </div><br/>
 <div id='chat'></div><br/>
