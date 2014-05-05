@@ -11,6 +11,7 @@
       }
     </style>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/json.js"></script>
     <script>
         var msg_pool = new Array();
 
@@ -26,9 +27,10 @@
       var timer_reconnect = null;
       var retry_interval = 5;
       var verbose = 0;
+      var ws;
       function start_wsserver() {
 	      var host = window.document.location.host.replace(/^http:\/\//, '');
-	      var ws = new WebSocket('ws://' + host);
+	      ws = new WebSocket('ws://' + host);
 	      ws.onmessage = function (event) {
 		      if (timer_reconnect) {
 			      clearInterval(timer_reconnect);
@@ -61,18 +63,48 @@
 	      };
       }
 
-      start_wsserver();
-    </script>
-    <script type = "text/javascript">
-	    // Define the entry point
+
     $(document).ready(function()
     {
-        updateStats({sender: 'System', data: "Welcome to jschat"});
+    var tabox = $('#tabox');
+    var msgbar=$('#msg');
+    $('#sendmsg').click(
+        function () {
+           var boxtext = tabox.val()
+           .replace(/>/g,'&gt;')
+           .replace(/</g, '&lt;')
+           .replace(/\r\n|\r|\n/g, "<br/>");
+           if (boxtext.length == 0) {
+                msgbar.html("cannot be empty");
+                return;
+           }
+           
+           var user = $('#username').val()
+           .replace(/>/g,'&gt;')
+           .replace(/</g, '&lt;');
+           if (user.length == 0) {
+                msgbar.html("missing username");
+                     $('#username').focus()
+                return;
+           }
+
+           var blob = {sender: user, data:boxtext};
+           ws.send(JSON.stringify(blob)); 
+           tabox.val('');
+           });
+    updateStats({sender: 'System', data: "Welcome to jschat"});
+    start_wsserver();
     });
-    </script>
-    </head>
-    <body>
-	    <strong>Lan Chat Server</strong><br>
-	    <div id='chat'></div><br>
-    </body>
+</script>
+</head>
+<body>
+<strong>Lan Chat Server</strong><br/>
+<div id='panel'>
+<input type="textbox" id="username" value="" length=25 style="width:200px;"><br/>
+<textarea id='tabox' cols=80 rows="25" style="width:200px; height:150px;" alt="mmm."></textarea>
+<input type=button id="sendmsg" value="Send"><br/>
+<div id=msg>...</div>
+</div><br/>
+<div id='chat'></div><br/>
+</body>
 </html>
