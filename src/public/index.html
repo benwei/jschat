@@ -2,13 +2,75 @@
 <html>
   <head>
     <style>
-      body {
-        font-family: Tahoma, Geneva, sans-serif;
-      }
+body {
+  font-family: Tahoma, Geneva, sans-serif;
+  background-color: #eeffff;
+}
 
-      div {
-        display: inline;
-      }
+div {
+  display:block;
+}
+
+.title-bar {
+  width: 338px; 
+  margin:0 auto;
+  position: relative;
+}
+#chat {
+  width: 338px; 
+  margin:0 auto;
+  position: relative;
+} 
+
+.chat-cont {
+  background-color: #eeeeee;
+  height: 20px;
+  width: 338px; 
+  padding: 5px; 
+  margin-bottom: 5px;
+  border-bottom: 1px solid silver;
+  border-left: 1px solid silver;
+  border-right: 1px solid silver; 
+  border-radius:3px;
+  position: relative;
+}
+
+#panel {
+  width: 348px; 
+  padding: 5px; 
+  margin:0 auto;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.panel-inner
+{
+  background-color: #eeeeee;
+  border-top: 1px solid #dddddd;
+  border-bottom: 1px solid silver;
+  border-left: 1px solid silver;
+  border-right: 1px solid silver; 
+  margin-left:3px;
+  padding-top:3px;
+  padding-left:3px;
+}
+
+.panel-action {
+  width: 136px;
+  margin-left:auto;
+  margin-right:0;
+  position: relative;
+}
+
+#username {
+  margin-right:3px;
+  width:250px;
+}
+#tabox {
+  width:319px;
+  height:100px;
+}
+
     </style>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script type="text/javascript" src="/json.js"></script>
@@ -16,7 +78,7 @@
         var msg_pool = new Array();
 
       function updateStats(blob) {
-	      var msg = blob.sender + ":" + blob.data + "<br>";
+	      var msg = '<div class="chat-cont">' + blob.sender + ":" + blob.data + "</div>";
           msg_pool.push(msg);
           var chats = msg_pool.join("");
           var height = $('body').height();
@@ -107,14 +169,20 @@
 </script>
 </head>
 <body>
+<div class="title-bar">
 <strong>Lan Chat Server</strong><br/>
+</div>
 <div id='panel'>
-<input type="textbox" id="username" value="" length=25 style="width:200px;"><input type=button id="btnregister" value="Register"><br/>
-<textarea id='tabox' cols=80 rows="25" style="width:200px; height:100px;"></textarea></textarea>
+<div class='panel-inner'>
+<input type="textbox" id="username" value="" length=25><input type=button id="btnregister" value="Register"><br/>
+<textarea id='tabox' cols=80 rows="25"></textarea></textarea>
+<div class='panel-action'>
 <input type=button id="sendmsg" value="Send">
-<input type=button id="btnclear" value="Clear"><br/>
+<input type=button id="btnclear" value="Clear">
+</div>
 <div id=msg>...</div>
-</div><br/>
-<div id='chat'></div><br/>
+</div>
+</div>
+<div id='chat'></div>
 </body>
 </html>
