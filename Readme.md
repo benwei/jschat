@@ -1,20 +1,39 @@
 # Brief
-  This is a prototype for chat server written by nodejs.
+
+This is a prototype for chat server written by nodejs in server side, nodejs client and webclient (jquery, css, html). clients and server are communicating with websocket channel.
+
+# Feature
+
+* support message cache on server side
+* support web client to send message as broadcast to all user
+* tested with chrome, firefox, saffari latest versions
+* support command line client (nodejs) to send message
 
 # Get started
 ## install
 
+```
   cd src
 
   npm install
+```
 
 ## run server
   
+```
   node src/mserver.js [port]
+```
 
 ## run client
-  node src/mclient.js [nickname] [host:port] 
 
+```
+  node src/mclient.js [nickname] [host:port] 
+```
+
+## snapshots
+
+![chat on 3 browers](https://raw.githubusercontent.com/benwei/jschat/master/docs/images/jschat_chrome_firefox_safari.png)
+![chat server console](https://raw.githubusercontent.com/benwei/jschat/master/docs/images/jschat_server_debug_console.png)
 # support commands by server
 
  Commands json syntax:
