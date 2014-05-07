@@ -26,6 +26,7 @@ div {
   background-color: #eeeeee;
   height: 20px;
   width: 338px; 
+  height: auto;
   padding: 5px; 
   margin-bottom: 5px;
   border-bottom: 1px solid silver;
@@ -71,101 +72,130 @@ div {
   height:100px;
 }
 
-    </style>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script type="text/javascript" src="/json.js"></script>
-    <script>
-        var msg_pool = new Array();
+</style>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="/json.js"></script>
+<script>
+var msg_pool = new Array();
+function pad(n) {
+   return n < 10 ? '0' : ''; 
+}
 
-      function updateStats(blob) {
-	      var msg = '<div class="chat-cont">' + blob.sender + ":" + blob.data + "</div>";
-          msg_pool.push(msg);
-          var chats = msg_pool.join("");
-          var height = $('body').height();
-          $('body').scrollTop(height);
-          $('#chat').html(chats);
-      }
+function dateToString(y, m, d, H, M, S) {
+    return y + "-" + pad(m) + m + "-" + pad(d) + d + " "
+           + pad(H) + H + ":" + pad(M) + M + ":" + pad(S) + S;
+}
 
-      var timer_reconnect = null;
-      var retry_interval = 5;
-      var verbose = 0;
-      var ws;
-      function start_wsserver() {
-	      var host = window.document.location.host.replace(/^http:\/\//, '');
-	      ws = new WebSocket('ws://' + host);
-	      ws.onmessage = function (event) {
-		      if (timer_reconnect) {
-			      clearInterval(timer_reconnect);
-			      timer_reconnect = null;
-			      updateStats({sender: 'Client', data:"Server connected."}); 
-		      }
+function TStoLocaltime(ts)
+{
+    var dtts = new Date(ts);
 
-		      var obj;
-		      try {
-			      obj = JSON.parse(event.data);
-		      } catch (e) {};
-		      if (obj)
-		      updateStats(obj);
-	      };
-	      ws.onerror = function (err) {
-		      console.log("ws error:" + JSON.stringify(err)); 
-              ws.close();
-	      };
-	      ws.onclose = function () {
-		      if (!timer_reconnect) {
-                  verbose = 1;
-			      timer_reconnect = setInterval(function () {
+    var utcstr = dateToString(dtts.getUTCFullYear(), dtts.getUTCMonth(), dtts.getUTCDate(),
+           dtts.getUTCHours(), dtts.getUTCMinutes(), dtts.getUTCSeconds());
+    var dt = new Date(utcstr+ " UTC");
+    return dateToString(dt.getFullYear(), dt.getMonth(), dt.getDate(),
+           dt.getHours(), dt.getMinutes(), dt.getSeconds());
+}
+
+function updateStats(blob) {
+    var msg = '<div class="chat-cont">';
+    if (blob.ts) {
+        msg += TStoLocaltime(blob.ts) + " ";
+    }
+    msg += blob.sender + ":" + blob.data + "</div>";
+    msg_pool.push(msg);
+    var chats = msg_pool.join("");
+    var height = $('body').height();
+    $('body').scrollTop(height);
+    $('#chat').html(chats);
+}
+
+var timer_reconnect = null;
+var retry_interval = 5;
+var verbose = 0;
+var ws;
+function start_wsserver() {
+    var host = window.document.location.host.replace(/^http:\/\//, '');
+    ws = new WebSocket('ws://' + host);
+    ws.onmessage = function (event) {
+        if (timer_reconnect) {
+            clearInterval(timer_reconnect);
+            timer_reconnect = null;
+            updateStats({sender: 'Client', data:"Server connected."}); 
+        }
+
+        var obj;
+        try {
+            obj = JSON.parse(event.data);
+        } catch (e) {};
+        if (obj)
+            updateStats(obj);
+    };
+    ws.onerror = function (err) {
+        console.log("ws error:" + JSON.stringify(err)); 
+        ws.close();
+    };
+    ws.onclose = function () {
+        if (!timer_reconnect) {
+            verbose = 1;
+            timer_reconnect = setInterval(function () {
                     if (verbose) {
-                        verbose = 0;
-                        updateStats({sender: 'Client', data:"Server has been shutdown, reconnecting..."}); 
+                    verbose = 0;
+                    updateStats({sender: 'Client', data:"Server has been shutdown, reconnecting..."}); 
                     }
-				      start_wsserver();
-			      }, retry_interval * 1000);
-		      }
-	      };
-      }
+                    start_wsserver();
+                    }, retry_interval * 1000);
+        }
+    };
+}
 
 
-    $(document).ready(function()
-    {
-    var tabox = $('#tabox');
-    var msgbar=$('#msg');
-    var user = "guest";
-    $('#sendmsg').click(
-        function () {
-           var boxtext = tabox.val()
-           .replace(/>/g,'&gt;')
-           .replace(/</g, '&lt;')
-           .replace(/\r\n|\r|\n/g, "<br/>");
-           if (boxtext.length == 0) {
-                msgbar.html("cannot be empty");
-                return;
-           }
-           
-           var blob = {sender: user, data:boxtext};
-           ws.send(JSON.stringify(blob)); 
-           });
+$(document).ready(function()
+        {
+        var tabox = $('#tabox');
+        var msgbar=$('#msg');
+        var user = "guest";
+        var onsending = false;
+        $('#sendmsg').click(
+            function () {
+            if (onsending)
+            return ;
+            onsending = true;
+            var boxtext = tabox.val()
+            .replace(/>/g,'&gt;')
+            .replace(/</g, '&lt;')
+            .replace(/\r\n|\r|\n/g, "<br/>");
+            if (boxtext.length == 0) {
+            msgbar.html("cannot be empty");
+            return;
+            }
 
-     $('#btnclear').click(function (){
-           tabox.val('');
-         });
-     $('#btnregister').click(function (){
-           user = $('#username').val()
-           .replace(/>/g,'&gt;')
-           .replace(/</g, '&lt;');
-           if (user.length == 0) {
+            var blob = {sender: user, data:boxtext};
+            ws.send(JSON.stringify(blob)); 
+
+            onsending = false;
+            });
+
+        $('#btnclear').click(function (){
+                tabox.val('');
+                });
+        $('#btnregister').click(function (){
+                user = $('#username').val()
+                .replace(/>/g,'&gt;')
+                .replace(/</g, '&lt;');
+                if (user.length == 0) {
                 msgbar.html("missing username");
-                     $('#username').focus()
+                $('#username').focus()
                 return;
-           }
+                }
 
-           var blob = {sender: user, cmd:'register'};
-           ws.send(JSON.stringify(blob)); 
-           });
+                var blob = {sender: user, cmd:'register'};
+                ws.send(JSON.stringify(blob)); 
+                });
 
-    updateStats({sender: 'System', data: "Welcome to jschat"});
-    start_wsserver();
-    });
+        updateStats({sender: 'System', data: "Welcome to jschat"});
+        start_wsserver();
+        });
 </script>
 </head>
 <body>
