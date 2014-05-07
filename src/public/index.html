@@ -11,6 +11,26 @@ div {
   display:block;
 }
 
+.clear {
+ float:none;
+}
+
+.sender {
+ color: blue;
+ margin-right: 10px;
+ float:left;
+}
+
+.data {
+
+}
+
+.timestamp {
+ color: gray;
+ font-size: 80%;
+}
+
+
 .title-bar {
   width: 338px; 
   margin:0 auto;
@@ -24,7 +44,6 @@ div {
 
 .chat-cont {
   background-color: #eeeeee;
-  height: 20px;
   width: 338px; 
   height: auto;
   padding: 5px; 
@@ -76,7 +95,7 @@ div {
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script type="text/javascript" src="/json.js"></script>
 <script>
-var msg_pool = new Array();
+
 function pad(n) {
    return n < 10 ? '0' : ''; 
 }
@@ -99,15 +118,15 @@ function TStoLocaltime(ts)
 
 function updateStats(blob) {
     var msg = '<div class="chat-cont">';
+    msg += '<div class="sender">' + blob.sender + "</div>"
+    msg += '<div class="data">' + blob.data + '</div>';
     if (blob.ts) {
-        msg += TStoLocaltime(blob.ts) + " ";
+        msg += '<br/><div class="timestamp">' + TStoLocaltime(blob.ts) + '</div>';
     }
-    msg += blob.sender + ":" + blob.data + "</div>";
-    msg_pool.push(msg);
-    var chats = msg_pool.join("");
+    msg + "</div>";
     var height = $('body').height();
     $('body').scrollTop(height);
-    $('#chat').html(chats);
+    $('#chat').append(msg);
 }
 
 var timer_reconnect = null;
