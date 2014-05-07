@@ -105,13 +105,18 @@ function dateToString(y, m, d, H, M, S) {
            + pad(H) + H + ":" + pad(M) + M + ":" + pad(S) + S;
 }
 
+function dateTo8601String(y, m, d, H, M, S) {
+    return y + "-" + pad(m) + m + "-" + pad(d) + d + "T"
+           + pad(H) + H + ":" + pad(M) + M + ":" + pad(S) + S + "Z";
+}
+
 function TStoLocaltime(ts)
 {
     var dtts = new Date(ts);
 
-    var utcstr = dateToString(dtts.getUTCFullYear(), dtts.getUTCMonth(), dtts.getUTCDate(),
+    var utcstr = dateTo8601String(dtts.getUTCFullYear(), dtts.getUTCMonth(), dtts.getUTCDate(),
            dtts.getUTCHours(), dtts.getUTCMinutes(), dtts.getUTCSeconds());
-    var dt = new Date(utcstr+ " UTC");
+    var dt = new Date(utcstr);
     return dateToString(dt.getFullYear(), dt.getMonth(), dt.getDate(),
            dt.getHours(), dt.getMinutes(), dt.getSeconds());
 }
