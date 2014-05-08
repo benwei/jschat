@@ -112,7 +112,8 @@ $(document).ready(function()
             .replace(/</g, '&lt;')
             .replace(/\r\n|\r|\n/g, "<br/>");
             if (boxtext.length == 0) {
-                floatMsgShow("cannot be empty");
+                floatMsgShow("chat message cannot be empty.");
+                onsending = false;
                 return;
             }
 
