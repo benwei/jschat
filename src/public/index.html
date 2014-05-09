@@ -32,8 +32,17 @@ function TStoLocaltime(ts)
            dt.getHours(), dt.getMinutes(), dt.getSeconds());
 }
 
+function post_hide(item) {
+    var target= '#post_' + item.attr('id').split('_')[1];
+    console.log("hide" + target);
+    $(target).hide();
+}
+
+var  post_num = 0;
 function updateStats(blob) {
-    var msg = '<div class="chat-cont">';
+    post_num++;
+
+    var msg = '<div id="post_' + post_num + '" class="chat-cont"><div id="rm_' + post_num + '" class="post-hide">x</div>';
     msg += '<div class="sender">' + blob.sender + "</div>"
     msg += '<div class="data">' + blob.data + '</div>';
     if (blob.ts) {
@@ -43,6 +52,19 @@ function updateStats(blob) {
     var height = $('body').height();
     $('body').scrollTop(height);
     $('#chat').append(msg);
+
+
+    $('#rm_' + post_num).click(function(){
+      post_hide($(this));
+    });
+    $('#post_' + post_num).mouseout(function (){
+            var num = $(this).attr('id').split('_')[1];
+            $("#rm_" + num).hide();
+            });
+    $('#post_' + post_num).mouseover(function (){
+            var num = $(this).attr('id').split('_')[1];
+            $("#rm_" + num).show();
+            });
 }
 
 var timer_reconnect = null;

@@ -110,3 +110,12 @@ div {
   height:100px;
 }
 
+.post-hide {
+  cursor: pointer;
+  left: 336px;
+  top: -3px;
+  text-wight: bold;
+  color:#aaaaaa;
+  position: absolute;
+  display: none;
+}
