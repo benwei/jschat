@@ -1,0 +1,112 @@
+body {
+  background-color: #fefefe;
+}
+
+div {
+  display:block;
+}
+
+.clear {
+ float:none;
+}
+
+.sender {
+ color: blue;
+ margin-right: 10px;
+ float:left;
+}
+
+.data {
+ word-wrap:break-word;
+}
+
+.timestamp {
+ color: gray;
+ font-size: 80%;
+ margin-top: 3px;
+}
+
+
+.title-bar {
+  text-align: center;
+  width: 348px; 
+  margin:0 auto;
+  font-size: 120%;
+  font-weight: bold;
+  padding: 5px; 
+  position: relative;
+}
+
+#chat {
+  width: 338px; 
+  margin:0 auto;
+  position: relative;
+} 
+
+.chat-cont {
+  background-color: #eeeeee;
+  width: 338px; 
+  height: auto;
+  padding: 5px; 
+  margin-bottom: 5px;
+  border-bottom: 1px solid silver;
+  border-left: 1px solid silver;
+  border-right: 1px solid silver; 
+  border-radius:3px;
+  position: relative;
+}
+
+#float-msg {
+  background-color: #ffeeee;
+  width: 348px;
+  margin-left: -174px;
+  height: auto;
+  padding: 5px; 
+  display:none;
+  text-align: center;
+  text-weight: bold;
+  left: -50%;
+  border-bottom: 1px solid silver;
+  border-left: 1px solid silver;
+  border-right: 1px solid silver; 
+  border-radius:3px;
+  z-index: 999;
+  position: absolute;
+}
+
+#panel {
+  width: 348px; 
+  padding: 5px; 
+  margin:0 auto;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.panel-inner
+{
+  background-color: #eeeeee;
+  border-top: 1px solid #dddddd;
+  border-bottom: 1px solid silver;
+  border-left: 1px solid silver;
+  border-right: 1px solid silver; 
+  margin-left:3px;
+  padding-top:3px;
+  padding-left:3px;
+}
+
+.panel-action {
+  width: 136px;
+  margin-left:auto;
+  margin-right:0;
+}
+
+#login-name {
+  margin-right:3px;
+  width:250px;
+}
+
+#tabox {
+  width:319px;
+  height:100px;
+}
+

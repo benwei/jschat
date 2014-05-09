@@ -1,97 +1,8 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <style>
-body {
-  font-family: Tahoma, Geneva, sans-serif;
-  background-color: #fefefe;
-}
-
-div {
-  display:block;
-}
-
-.clear {
- float:none;
-}
-
-.sender {
- color: blue;
- margin-right: 10px;
- float:left;
-}
-
-.data {
-
-}
-
-.timestamp {
- color: gray;
- font-size: 80%;
-}
-
-
-.title-bar {
-  width: 338px; 
-  margin:0 auto;
-  position: relative;
-}
-#chat {
-  width: 338px; 
-  margin:0 auto;
-  position: relative;
-} 
-
-.chat-cont {
-  background-color: #eeeeee;
-  width: 338px; 
-  height: auto;
-  padding: 5px; 
-  margin-bottom: 5px;
-  border-bottom: 1px solid silver;
-  border-left: 1px solid silver;
-  border-right: 1px solid silver; 
-  border-radius:3px;
-  position: relative;
-}
-
-#panel {
-  width: 348px; 
-  padding: 5px; 
-  margin:0 auto;
-  margin-bottom: 20px;
-  position: relative;
-}
-
-.panel-inner
-{
-  background-color: #eeeeee;
-  border-top: 1px solid #dddddd;
-  border-bottom: 1px solid silver;
-  border-left: 1px solid silver;
-  border-right: 1px solid silver; 
-  margin-left:3px;
-  padding-top:3px;
-  padding-left:3px;
-}
-
-.panel-action {
-  width: 136px;
-  margin-left:auto;
-  margin-right:0;
-  position: relative;
-}
-
-#username {
-  margin-right:3px;
-  width:250px;
-}
-#tabox {
-  width:319px;
-  height:100px;
-}
-
-</style>
+<head>
+<title>Wow Chat</title>
+<link rel="stylesheet" type="text/css" href="css/app.css">
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script type="text/javascript" src="/json.js"></script>
 <script>
@@ -126,7 +37,7 @@ function updateStats(blob) {
     msg += '<div class="sender">' + blob.sender + "</div>"
     msg += '<div class="data">' + blob.data + '</div>';
     if (blob.ts) {
-        msg += '<br/><div class="timestamp">' + TStoLocaltime(blob.ts) + '</div>';
+        msg += '<div class="timestamp">' + TStoLocaltime(blob.ts) + '</div>';
     }
     msg + "</div>";
     var height = $('body').height();
@@ -173,25 +84,37 @@ function start_wsserver() {
     };
 }
 
+function floatMsgShow(float_msg) {
+    var msgbar=$('#float-msg');
+    msgbar.html(float_msg);
+    try {
+    msgbar.show();
+    } catch (e) {}
+
+    setTimeout(function (){
+    msgbar.hide().fadeOut(2000); }, 1000);
+}
+
 
 $(document).ready(function()
         {
         var tabox = $('#tabox');
-        var msgbar=$('#msg');
         var user = "guest";
         var onsending = false;
         $('#sendmsg').click(
             function () {
-            if (onsending)
-            return ;
+            if (onsending)  {
+                return ;
+            }
             onsending = true;
             var boxtext = tabox.val()
             .replace(/>/g,'&gt;')
             .replace(/</g, '&lt;')
             .replace(/\r\n|\r|\n/g, "<br/>");
             if (boxtext.length == 0) {
-            msgbar.html("cannot be empty");
-            return;
+                floatMsgShow("chat message cannot be empty.");
+                onsending = false;
+                return;
             }
 
             var blob = {sender: user, data:boxtext};
@@ -204,12 +127,12 @@ $(document).ready(function()
                 tabox.val('');
                 });
         $('#btnregister').click(function (){
-                user = $('#username').val()
+                user = $('#login-name').val()
                 .replace(/>/g,'&gt;')
                 .replace(/</g, '&lt;');
                 if (user.length == 0) {
-                msgbar.html("missing username");
-                $('#username').focus()
+                floatMsgShow("missing login name");
+                $('#login-name').focus()
                 return;
                 }
 
@@ -223,18 +146,17 @@ $(document).ready(function()
 </script>
 </head>
 <body>
-<div class="title-bar">
-<strong>Lan Chat Server</strong><br/>
+<div style="position: absolute; left: 50%;"><div id='float-msg'></div>
 </div>
+<div class="title-bar">Lan Chat</div>
 <div id='panel'>
 <div class='panel-inner'>
-<input type="textbox" id="username" value="" length=25><input type=button id="btnregister" value="Register"><br/>
+<input type="textbox" id="login-name" value="" length=25><input type=button id="btnregister" value="Register"><br/>
 <textarea id='tabox' cols=80 rows="25"></textarea></textarea>
 <div class='panel-action'>
 <input type=button id="sendmsg" value="Send">
 <input type=button id="btnclear" value="Clear">
 </div>
-<div id=msg>...</div>
 </div>
 </div>
 <div id='chat'></div>
