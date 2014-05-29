@@ -25,6 +25,7 @@
   "dependencies": {
     "express": ">=3.0",
     "ws": ">=0.4",
-    "nconf": ">=0.6"
+    "nconf": ">=0.6",
+    "daemon": ">=1.1"
   }
 }
