@@ -5,6 +5,7 @@
 <link rel="stylesheet" type="text/css" href="css/app.css">
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script type="text/javascript" src="/json.js"></script>
+<script type="text/javascript" src="/linkify.js"></script>
 <script>
 
 function pad(n) {
@@ -44,7 +45,7 @@ function updateStats(blob) {
 
     var msg = '<div id="post_' + post_num + '" class="chat-cont"><div id="rm_' + post_num + '" class="post-hide">x</div>';
     msg += '<div class="sender">' + blob.sender + "</div>"
-    msg += '<div class="data">' + blob.data + '</div>';
+    msg += '<div class="data">' + linkify(blob.data) + '</div>';
     if (blob.ts) {
         msg += '<div class="timestamp">' + TStoLocaltime(blob.ts) + '</div>';
     }
