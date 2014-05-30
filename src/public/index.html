@@ -159,6 +159,10 @@ $(document).ready(function()
                 return;
                 }
 
+                $('#btnregister').hide();
+                $('#login-name').prop('disabled', true);
+                $('#login-name').css({"background-color":"transparent",
+                    "border": "0px solid"});
                 var blob = {sender: user, cmd:'register'};
                 ws.send(JSON.stringify(blob)); 
                 });
