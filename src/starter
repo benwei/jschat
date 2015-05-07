@@ -1,2 +1,10 @@
 #!/bin/sh
-node mserver.js
+
+case $1 in
+stop)
+killall node
+;;
+*)
+node mserver.js &
+;;
+esac

@@ -3,13 +3,14 @@
 <head>
 <title>Wow Chat</title>
 <link rel="stylesheet" type="text/css" href="css/app.css">
+<meta name="viewport" content="width=400">
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script type="text/javascript" src="/json.js"></script>
 <script type="text/javascript" src="/linkify.js"></script>
 <script>
 
 function pad(n) {
-   return n < 10 ? '0' : ''; 
+   return n < 10 ? "0" : "";
 }
 
 function dateToString(y, m, d, H, M, S) {
@@ -34,7 +35,7 @@ function TStoLocaltime(ts)
 }
 
 function post_hide(item) {
-    var target= '#post_' + item.attr('id').split('_')[1];
+    var target= "#post_" + item.attr("id").split("_")[1];
     console.log("hide" + target);
     $(target).hide();
 }
@@ -43,27 +44,27 @@ var  post_num = 0;
 function updateStats(blob) {
     post_num++;
 
-    var msg = '<div id="post_' + post_num + '" class="chat-cont"><div id="rm_' + post_num + '" class="post-hide">x</div>';
-    msg += '<div class="sender">' + blob.sender + "</div>"
-    msg += '<div class="data">' + linkify(blob.data) + '</div>';
+    var msg = "<div id=\"post_" + post_num + "\" class=\"chat-cont\"><div id=\"rm_" + post_num + "\" class=\"post-hide\">x</div>";
+    msg += "<div class=\"sender\">" + blob.sender + "</div>"
+    msg += "<div class=\"data\">" + linkify(blob.data) + "</div>";
     if (blob.ts) {
-        msg += '<div class="timestamp">' + TStoLocaltime(blob.ts) + '</div>';
+        msg += "<div class=\"timestamp\">" + TStoLocaltime(blob.ts) + "</div>";
     }
     msg + "</div>";
-    var height = $('body').height();
-    $('body').scrollTop(height);
-    $('#chat').append(msg);
+    var height = $("body").height();
+    $("body").scrollTop(height);
+    $("#chat").append(msg);
 
 
-    $('#rm_' + post_num).click(function(){
+    $("#rm_" + post_num).click(function(){
       post_hide($(this));
     });
-    $('#post_' + post_num).mouseout(function (){
-            var num = $(this).attr('id').split('_')[1];
+    $("#post_" + post_num).mouseout(function (){
+            var num = $(this).attr("id").split("_")[1];
             $("#rm_" + num).hide();
             });
-    $('#post_' + post_num).mouseover(function (){
-            var num = $(this).attr('id').split('_')[1];
+    $("#post_" + post_num).mouseover(function (){
+            var num = $(this).attr("id").split("_")[1];
             $("#rm_" + num).show();
             });
 }
@@ -73,13 +74,13 @@ var retry_interval = 5;
 var verbose = 0;
 var ws;
 function start_wsserver() {
-    var host = window.document.location.host.replace(/^http:\/\//, '');
-    ws = new WebSocket('ws://' + host);
+    var host = window.document.location.host.replace(/^http:\/\//, "");
+    ws = new WebSocket("ws://" + host);
     ws.onmessage = function (event) {
         if (timer_reconnect) {
             clearInterval(timer_reconnect);
             timer_reconnect = null;
-            updateStats({sender: 'Client', data:"Server connected."}); 
+            updateStats({sender: "Client", data:"Server connected."});
         }
 
         var obj;
@@ -90,7 +91,7 @@ function start_wsserver() {
             updateStats(obj);
     };
     ws.onerror = function (err) {
-        console.log("ws error:" + JSON.stringify(err)); 
+        console.log("ws error:" + JSON.stringify(err));
         ws.close();
     };
     ws.onclose = function () {
@@ -99,7 +100,7 @@ function start_wsserver() {
             timer_reconnect = setInterval(function () {
                     if (verbose) {
                     verbose = 0;
-                    updateStats({sender: 'Client', data:"Server has been shutdown, reconnecting..."}); 
+                    updateStats({sender: "Client", data:"Server has been shutdown, reconnecting..."});
                     }
                     start_wsserver();
                     }, retry_interval * 1000);
@@ -108,7 +109,7 @@ function start_wsserver() {
 }
 
 function floatMsgShow(float_msg) {
-    var msgbar=$('#float-msg');
+    var msgbar=$("#float-msg");
     msgbar.html(float_msg);
     try {
     msgbar.show();
@@ -121,18 +122,18 @@ function floatMsgShow(float_msg) {
 
 $(document).ready(function()
         {
-        var tabox = $('#tabox');
+        var tabox = $("#tabox");
         var user = "guest";
         var onsending = false;
-        $('#sendmsg').click(
+        $("#sendmsg").click(
             function () {
             if (onsending)  {
                 return ;
             }
             onsending = true;
             var boxtext = tabox.val()
-            .replace(/>/g,'&gt;')
-            .replace(/</g, '&lt;')
+            .replace(/>/g,"&gt;")
+            .replace(/</g, "&lt;")
             .replace(/\r\n|\r|\n/g, "<br/>");
             if (boxtext.length == 0) {
                 floatMsgShow("chat message cannot be empty.");
@@ -141,51 +142,59 @@ $(document).ready(function()
             }
 
             var blob = {sender: user, data:boxtext};
-            ws.send(JSON.stringify(blob)); 
+            ws.send(JSON.stringify(blob));
 
             onsending = false;
+
+            if ($("#isClearAfterSend").is(":checked"))
+              tabox.val("");
             });
 
-        $('#btnclear').click(function (){
-                tabox.val('');
+        $("#btnclear").click(function (){
+                tabox.val("");
                 });
-        $('#btnregister').click(function (){
-                user = $('#login-name').val()
-                .replace(/>/g,'&gt;')
-                .replace(/</g, '&lt;');
+
+        $("#isClearAfterSend").attr("checked","checked");
+
+        $("#btnregister").click(function (){
+                user = $("#login-name").val()
+                .replace(/>/g,"&gt;")
+                .replace(/</g, "&lt;");
                 if (user.length == 0) {
                 floatMsgShow("missing login name");
-                $('#login-name').focus()
+                $("#login-name").focus()
                 return;
                 }
 
-                $('#btnregister').hide();
-                $('#login-name').prop('disabled', true);
-                $('#login-name').css({"background-color":"transparent",
+                $("#btnregister").hide();
+                $("#login-name").prop("disabled", true);
+                $("#login-name").css({"background-color":"transparent",
                     "border": "0px solid"});
-                var blob = {sender: user, cmd:'register'};
-                ws.send(JSON.stringify(blob)); 
+                var blob = {sender: user, cmd:"register"};
+                ws.send(JSON.stringify(blob));
                 });
 
-        updateStats({sender: 'System', data: "Welcome to jschat"});
+        updateStats({sender: "System", data: "Welcome to jschat"});
         start_wsserver();
         });
 </script>
 </head>
 <body>
-<div style="position: absolute; left: 50%;"><div id='float-msg'></div>
+<div style="position: absolute; left: 50%;"><div id="float-msg"></div>
 </div>
 <div class="title-bar">Lan Chat</div>
-<div id='panel'>
-<div class='panel-inner'>
+<div id="panel">
+<div class="panel-inner">
+<a href="/print.html" target="_blank">Print Version</a><br/>
 <input type="textbox" id="login-name" value="" length=25><input type=button id="btnregister" value="Register"><br/>
-<textarea id='tabox' cols=80 rows="25"></textarea></textarea>
-<div class='panel-action'>
+<textarea id="tabox" cols=80 rows="25"></textarea></textarea>
+<div class="panel-action">
 <input type=button id="sendmsg" value="Send">
 <input type=button id="btnclear" value="Clear">
 </div>
+<input type="checkbox" id="isClearAfterSend">clear after sent
 </div>
 </div>
-<div id='chat'></div>
+<div id="chat"></div>
 </body>
 </html>
