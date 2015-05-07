@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wow Chat</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="/json.js"></script>
+<script type="text/javascript" src="/linkify.js"></script>
+<script>
+
+function pad(n) {
+   return n < 10 ? '0' : '';
+}
+
+function dateToString(y, m, d, H, M, S) {
+    return y + "-" + pad(m) + m + "-" + pad(d) + d + " "
+           + pad(H) + H + ":" + pad(M) + M + ":" + pad(S) + S;
+}
+
+function dateTo8601String(y, m, d, H, M, S) {
+    return y + "-" + pad(m) + m + "-" + pad(d) + d + "T"
+           + pad(H) + H + ":" + pad(M) + M + ":" + pad(S) + S + "Z";
+}
+
+function TStoLocaltime(ts)
+{
+    var dtts = new Date(ts);
+
+    var utcstr = dateTo8601String(dtts.getUTCFullYear(), dtts.getUTCMonth(), dtts.getUTCDate(),
+           dtts.getUTCHours(), dtts.getUTCMinutes(), dtts.getUTCSeconds());
+    var dt = new Date(utcstr);
+    return dateToString(dt.getFullYear(), dt.getMonth(), dt.getDate(),
+           dt.getHours(), dt.getMinutes(), dt.getSeconds());
+}
+
+function nowtoLocaltimeString(ts)
+{
+    var dt = new Date();
+    return dateToString(dt.getFullYear(), dt.getMonth(), dt.getDate(),
+           dt.getHours(), dt.getMinutes(), dt.getSeconds());
+}
+
+var  post_num = 0;
+function updateStats(blob) {
+    post_num++;
+
+    var msg = '<div id="post_' + post_num + '" class="chat-cont">';
+    msg += '<div>' ;
+    if (blob.ts) {
+        msg += TStoLocaltime(blob.ts);
+    }
+    msg += '&nbsp;[' + blob.sender + "]</div>";
+    msg += '<div class="data">' + linkify(blob.data) + '</div>';
+    msg += "</div><div>&nbsp;</div>";
+    $('#chat').append(msg);
+}
+
+var timer_reconnect = null;
+var retry_interval = 5;
+var verbose = 0;
+var ws;
+function start_wsserver() {
+    var host = window.document.location.host.replace(/^http:\/\//, '');
+    ws = new WebSocket('ws://' + host);
+    ws.onmessage = function (event) {
+        if (timer_reconnect) {
+            clearInterval(timer_reconnect);
+            timer_reconnect = null;
+            updateStats({sender: 'Client', data:"Server connected."});
+        }
+
+        var obj;
+        try {
+            obj = JSON.parse(event.data);
+        } catch (e) {};
+        if (obj)
+            updateStats(obj);
+    };
+    ws.onerror = function (err) {
+        console.log("ws error:" + JSON.stringify(err));
+        ws.close();
+    };
+    ws.onclose = function () {
+        if (!timer_reconnect) {
+            verbose = 1;
+            timer_reconnect = setInterval(function () {
+                    if (verbose) {
+                    verbose = 0;
+                    updateStats({sender: 'Client', data:"Server has been shutdown, reconnecting..."});
+                    }
+                    start_wsserver();
+                    }, retry_interval * 1000);
+        }
+    };
+}
+
+
+$(document).ready(function()
+        {
+        // updateStats({sender: 'System', data: "Welcome to jschat"});
+        $('.title-bar').text("Lan Chat at " + nowtoLocaltimeString());
+        start_wsserver();
+        });
+</script>
+</head>
+<body>
+<div class="title-bar"></div>
+<div>&nbsp;</div>
+<div id='chat'></div>
+</body>
+</html>
