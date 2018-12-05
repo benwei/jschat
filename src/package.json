@@ -1,15 +1,16 @@
 {
   "name": "jschat",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "authors": "ben6",
-  "description": "chat server written by nodejs",
+  "description": "Chat server written by nodejs",
   "keywords": [
     "javascript",
     "chat"
   ],
   "maintainers": [
-    { "name": "Ben Wei",
-      "email": "ben@staros.mobi"
+    {
+      "name": "Ben Wei",
+      "email": "ben@juluos.org"
     }
   ],
   "licenses": [
@@ -23,12 +24,12 @@
   },
   "main": "./mserver.js",
   "dependencies": {
-    "express": "=3.0",
+    "express": "=3.11.0",
     "ws": "=0.4",
     "nconf": "=0.6",
     "daemon": "=1.1"
   },
   "scripts": {
-      "start": "node ./mserver.js"
+    "start": "node ./mserver.js"
   }
 }

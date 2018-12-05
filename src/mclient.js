@@ -1,6 +1,6 @@
 /**********************************************************************
 
-Copyright (c) 2012 Ben Wei <ben@storos.mobi>
+Copyright (c) 2018 Ben Wei <ben@juluos.org>
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
