@@ -24,10 +24,19 @@
   },
   "main": "./mserver.js",
   "dependencies": {
-    "express": "=3.11.0",
-    "ws": "=0.4",
+    "daemon": "=1.1",
+    "debug": ">=2.6.9",
+    "express": "^4.16.4",
+    "fresh": ">=0.5.2",
+    "method-override": "=2.3.10",
+    "mime": ">=1.4.1",
+    "ms": ">=0.7.1",
     "nconf": "=0.6",
-    "daemon": "=1.1"
+    "negotiator": ">=0.6.1",
+    "qs": ">=1.0.0",
+    "send": "^0.16.2",
+    "serve-index": ">=1.6.3",
+    "ws": "^6.1.2"
   },
   "scripts": {
     "start": "node ./mserver.js"
