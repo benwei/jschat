@@ -8,7 +8,7 @@ This is a prototype for chat server written by nodejs in server side, nodejs cli
 * support web client to send message as broadcast to all user
 * tested with chrome, firefox, saffari latest versions
 * support command line client (nodejs) to send message
-* support Enter Key to send message directly, shift + CTRL for se 
+* support Enter Key to send message directly, shift + CTRL for new line 
 * let others can connect Chat Board
 
 # Get started
