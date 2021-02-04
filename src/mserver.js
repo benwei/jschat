@@ -198,7 +198,7 @@ if (process.argv.length >=3)
                 });
 
         var server = http.createServer(app);
-        server.listen(server_port);
+        server.listen(server_port, "0.0.0.0");
 
         var wss = new WebSocketServer({server: server});
 

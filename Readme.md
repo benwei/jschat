@@ -69,7 +69,7 @@ This is a prototype for chat server written by nodejs in server side, nodejs cli
 
 (The MIT License)
 
-Copyright (c) 2012 Ben Wei &lt;ben@storos.mobi&gt;
+Copyright (c) 2012 Ben Wei &lt;ben@juluos.org&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
