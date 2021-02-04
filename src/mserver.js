@@ -32,7 +32,7 @@ app = express();
 
 
 function UTCTimestamp() {
-    var now = new Date(); 
+    var now = new Date();
     var now_utc = new Date(
             now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
             now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
@@ -228,7 +228,7 @@ if (process.argv.length >=3)
                     if (obj.hasOwnProperty('cmd')){
                     cmd = obj['cmd'];
                     }
-                    console.log(data);
+                    console.log("recviced:" + data);
                     } catch (e) {};
 
                     if (!message)
@@ -266,6 +266,7 @@ if (process.argv.length >=3)
                     blob.ts = UTCTimestamp();
                     var msg = JSON.stringify(blob);
                     cache_messages.push(msg);
+		    console.log("notify:" + msg);
 
                     for (var i=0; i < clients.length ; i++) {
                         var c = clients[i];
@@ -295,11 +296,10 @@ if (process.argv.length >=3)
 
                 // while first login resend old messages in advance.
                 // FIXME: need to support get older message by paging
-                // FIXME:cache mechanism should have 
+                // FIXME:cache mechanism should have
                 function restore_cache_messages() {
                     var limit_restore_cache_count = 100;
-                    var cache_count = (cache_messages.length  > limit_restore_cache_count) ? limit_restore_cache_count : cache_messages.length; 
-                    console.log("test: " + cache_count.toString());
+                    var cache_count = (cache_messages.length  > limit_restore_cache_count) ? limit_restore_cache_count : cache_messages.length;
                     for (var m=0; m <cache_count; m++) {
                         ws.send(cache_messages[m]);
                     }

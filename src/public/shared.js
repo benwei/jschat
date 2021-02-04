@@ -15,7 +15,7 @@ function dateTo8601String(y, m, d, H, M, S) {
 function TStoLocaltime(ts_string)
 {
     ts = parseInt(ts_string, 10);
-    console.log(ts);
+
     var dt = new Date(ts);
 
     dt.setMinutes(dt.getMinutes() - dt.getTimezoneOffset());

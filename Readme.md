@@ -8,6 +8,8 @@ This is a prototype for chat server written by nodejs in server side, nodejs cli
 * support web client to send message as broadcast to all user
 * tested with chrome, firefox, saffari latest versions
 * support command line client (nodejs) to send message
+* support Enter Key to send message directly, shift + CTRL for se 
+* let others can connect Chat Board
 
 # Get started
 ## install
@@ -69,7 +71,7 @@ This is a prototype for chat server written by nodejs in server side, nodejs cli
 
 (The MIT License)
 
-Copyright (c) 2012 Ben Wei &lt;ben@juluos.org&gt;
+Copyright (c) 2012-2021 Ben Wei &lt;ben@juluos.org&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

@@ -95,36 +95,56 @@ function floatMsgShow(float_msg) {
     msgbar.hide().fadeOut(2000); }, 1000);
 }
 
+var user = "guest";
+var onsending = false;
+function do_send_message()
+{
+    if (onsending)  {
+    return ;
+    }
+    var tabox = $("#tabox")
+    onsending = true;
+    var boxtext = tabox.val()
+    .replace(/>/g,"&gt;")
+    .replace(/</g, "&lt;")
+    .replace(/\r\n|\r|\n/g, "<br/>");
+    if (boxtext.length == 0) {
+    floatMsgShow("chat message cannot be empty.");
+    onsending = false;
+    return;
+    }
+
+    var blob = {sender: user, data:boxtext};
+    ws.send(JSON.stringify(blob));
+
+    onsending = false;
+
+    if ($("#isClearAfterSend").is(":checked")) {
+      tabox.val("");
+    }
+}
+
+function change_input_enter_key_behavior()
+{
+    $('#tabox').on("keydown", function(e) {
+            /* ENTER PRESSED*/
+	    if (e.shiftKey && e.keyCode == 13) {
+			    // do enter
+	    }
+            else if (e.keyCode == 13) {
+       		$("#sendmsg").focus().click();
+                return false;
+            }
+        });
+}
+
 
 $(document).ready(function()
         {
         var tabox = $("#tabox");
-        var user = "guest";
-        var onsending = false;
-        $("#sendmsg").click(
-            function () {
-            if (onsending)  {
-                return ;
-            }
-            onsending = true;
-            var boxtext = tabox.val()
-            .replace(/>/g,"&gt;")
-            .replace(/</g, "&lt;")
-            .replace(/\r\n|\r|\n/g, "<br/>");
-            if (boxtext.length == 0) {
-                floatMsgShow("chat message cannot be empty.");
-                onsending = false;
-                return;
-            }
+    change_input_enter_key_behavior();
 
-            var blob = {sender: user, data:boxtext};
-            ws.send(JSON.stringify(blob));
-
-            onsending = false;
-
-            if ($("#isClearAfterSend").is(":checked"))
-              tabox.val("");
-            });
+    $("#sendmsg").click(function() {do_send_message();});
 
         $("#btnclear").click(function (){
                 tabox.val("");
@@ -162,6 +182,7 @@ $(document).ready(function()
 <div id="panel">
 <div class="panel-inner">
 <a href="/print.html" target="_blank">Print Version</a><br/>
+New line(shift+Enter)
 <input type="textbox" id="login-name" value="" length=25><input type=button id="btnregister" value="Register"><br/>
 <textarea id="tabox" cols=80 rows="25"></textarea></textarea>
 <div class="panel-action">
