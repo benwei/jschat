@@ -43,7 +43,7 @@
     "send": "^0.16.2",
     "serve-index": ">=1.6.3",
     "upgrade": "^1.1.0",
-    "ws": ">=7.4.6"
+    "ws": ">=8.17.1"
   },
   "scripts": {
     "start": "node ./mserver.js"
