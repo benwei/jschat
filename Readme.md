@@ -68,4 +68,4 @@ This is a prototype for chat server written by nodejs in server side, nodejs cli
   while you type CTRL+C on server, server will disconnect all client.
 
 ## Appendix
-* [License file](License.md)
+* [License file](License)
