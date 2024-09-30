@@ -8,7 +8,7 @@ This is a prototype for chat server written by nodejs in server side, nodejs cli
 * support web client to send message as broadcast to all user
 * tested with chrome, firefox, saffari latest versions
 * support command line client (nodejs) to send message
-* support Enter Key to send message directly, shift + CTRL for new line 
+* support Enter Key to send message directly, shift + CTRL for new line
 * let others can connect Chat Board
 
 # Get started
@@ -21,7 +21,7 @@ This is a prototype for chat server written by nodejs in server side, nodejs cli
 ```
 
 ## run server
-  
+
 ```
   node src/mserver.js [port]
 ```
@@ -29,7 +29,7 @@ This is a prototype for chat server written by nodejs in server side, nodejs cli
 ## run client
 
 ```
-  node src/mclient.js [nickname] [host:port] 
+  node src/mclient.js [nickname] [host:port]
 ```
 
 ## snapshots
@@ -55,7 +55,7 @@ This is a prototype for chat server written by nodejs in server side, nodejs cli
  Once your client has registered by Register command, the sender field won't be reference anymore.
 
 ## Send Text Message to specific user id
- 
+
  `{ "cmd": "msg", "data": "your message", "target_id": "id number"}`
 
  if you don't assign target_id, you can compose them in data field.
@@ -67,27 +67,5 @@ This is a prototype for chat server written by nodejs in server side, nodejs cli
 
   while you type CTRL+C on server, server will disconnect all client.
 
-## License ##
-
-(The MIT License)
-
-Copyright (c) 2012-2021 Ben Wei &lt;ben@juluos.org&gt;
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-'Software'), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+## Appendix
+* [License file](License.md)
