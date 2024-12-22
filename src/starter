@@ -1,10 +1,47 @@
-#!/bin/sh
+#!/bin/bash
+mserver_pid=0
+mserver_pidfile=/tmp/mserver.pid
+if [ -f "${mserver_pidfile}" ] ; then
+	mserver_pid=$((0 + `cat ${mserver_pidfile} | tr -d ' '`))
+fi
+
+is_mserver_running=0
+if [ "$mserver_pid" -ne 0 ]; then
+	kill -0 $mserver_pid 2>/dev/null
+	if [ $? -eq 0 ]; then
+		is_mserver_running=1
+	fi
+fi
+
+
+start_mserver_ifneed()
+{
+	if [ $is_mserver_running -eq 1 ]; then
+		echo "mserver has been started."
+		return 1
+	fi
+	node mserver.js &
+	mserver_pid="$!" 
+	echo "$mserver_pid" > ${mserver_pidfile}
+	echo "mserver($mserver_pid) is started."
+}
+
+stop_mserver_by_pid()
+{
+	if [ $is_mserver_running -eq 1 ]; then
+		kill $mserver_pid
+		echo "mserver is stopped."
+		rm -f "$mserver_pidfile"
+	else
+		echo "mserver is not running"
+	fi
+}
 
 case $1 in
 stop)
-killall node
+	stop_mserver_by_pid
 ;;
 *)
-node mserver.js &
+	start_mserver_ifneed
 ;;
 esac

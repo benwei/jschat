@@ -1,6 +1,6 @@
 /**********************************************************************
 
-Copyright (c) 2018 Ben Wei <ben@juluos.org>
+Copyright (c) 2018 - 2024 Ben Wei <ben@juluos.org>
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -22,6 +22,8 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *********************************************************************/
 
+const e = require('express');
+const { json } = require('express');
 var WebSocket = require('ws'),
 nconf= require('nconf');
 
@@ -55,25 +57,31 @@ function ChatClient(wsurl) {
 
     this.cmdfunc = function (cmd, args) {
         try {
-            var blob = JSON.stringify({cmd: cmd, data: args});
-            ws.send(blob);
+            var blob;
+            var mdata = args.shift();
+            var mcmd = cmd.replace('/', '')
+            if (mcmd == 'register') {
+                blob = {cmd: mcmd , data: args[2], sender: args[1]};
+            } else {
+                blob = {cmd: mcmd, data: mdata};
+            }
+            json_data = JSON.stringify(blob);
+            ws.send(json_data);
         } catch (e) {
-            console.log(e);
+            console.log(json.stringify(e));
         }
     }
 
     this.send = function (data) {
         try {
-            var cmd = '';
+            var cmd = undefined;
             var str = data.toString();
-            if (data[0] == 47) {
-                var i = str.indexOf(' ');
-                var args= '';
-                if (i > 1) {
-                    cmd = str.substring(1, i);
-                    args = str.slice(i+1);
-                } else if (str.length > 3) {
-                    cmd = str.substring(1, str.length);
+            var args= [];
+            if (data[0] == '/') { 
+                var parts = str.split(' ');
+                if (parts.length > 1) {
+                    cmd = parts[0];
+                    args = parts;
                 }
             }
 
@@ -93,24 +101,112 @@ function ChatClient(wsurl) {
         process.exit(0);
     });
 
+    function padingNN(num) {
+            return num.toString().padStart(2, "0");
+    }
+    function tsToDateString(msTimestamp) {
+        const splitter = '-';
+        const date = new Date(msTimestamp);
+        var dstr = [ date.getFullYear(),
+                padingNN(date.getMonth() + 1),
+                padingNN(date.getDate()),
+              ].join(splitter) ;
+        dstr += " " + [ padingNN(date.getHours()),
+                padingNN(date.getMinutes()),
+                padingNN(date.getSeconds()),
+              ].join(":");
+        return dstr;
+    }
+
     ws.on('message', function(data, flags) {
         var obj = null;
         var sender = null;
-        var message = null;
+        var blob = null;
+        var ts = null;
         // flags.binary will be set if a binary data is received
         // flags.masked will be set if the data was masked
         try {
             obj = JSON.parse(data);
-            sender = obj['sender'];
-            message = obj['data'];
+            sender = obj.sender;
+            blob = obj.data;
+            ts = obj.ts;
+            // [D] console.log("dump:", obj);
         } catch (e) {
             // eat it. treat as text message only
         };
+        const decoder = new TextDecoder("UTF-8");
 
         if (sender) {
-            console.log(sender + "> " + message);
+            var strts = ts.toString()
+            var msts = parseInt(ts.toString(), 10);
+            var line = '>> ';
+            // [D] + " ts(" + strts + "): ";
+            const date_str = tsToDateString(msts);
+            if (blob.type == 'Buffer')
+            line += decoder.decode(Buffer.from(blob.data));
+            else if( blob.type == 'String'){
+                line += blob.data;
+            } 
+            console.log(sender + ' ' + date_str + line);
         } else {
-            console.log("> " + data);
+            json_str = JSON.stringify(data);
+            
+            var objs = JSON.parse(json_str)
+            var obj1= decoder.decode(Buffer.from(objs.data))
+            console.log("?> " + obj1);
+            if (typeof obj1 == 'string') {
+		var obj1_is_json = false;
+                const xdata = new TextEncoder().encode(obj1)
+                try {
+               		var xobj = JSON.parse(obj1);
+                	console.log("j> " +  xobj['data'], xobj['ts']);
+			obj1_is_json = true;
+                } catch(e) {
+                    // pass;
+                }
+                console.log("buffer --->" + data);
+
+                function hex_num(n) {
+                    const asciis = '0123456789ABCDEF'
+                    return asciis[n];
+                }
+                
+		function bos_xxd_builtin(adata) {
+			hex_line = '';
+			asc_line = '';
+			var hex_lines = [];
+			var remain = adata.length % 16;
+			if (remain > 0) padding_zeros = 16 - remain;
+
+			for (var i = 0; i < adata.length + padding_zeros; i+=1) {
+			    element = 0;
+			    if (i < adata.length) {
+				element = adata[i];
+				hex_line += hex_num(element>>4) + hex_num(element%16);
+				asc_line += String.fromCharCode(element);
+			    } else {
+				hex_line += "  ";
+				asc_line += " ";
+			    }
+
+			    if ((i % 2) == 1) hex_line += ' ';
+			    if (((i+1) % 16) == 0) {
+			       hex_lines.push(hex_line + '  ' + asc_line);
+			       hex_line = '';
+			       asc_line = '';
+			    }
+			}
+			if (hex_line.length>0) {
+			    hex_lines.push(hex_line + '  ' + asc_line);
+			}
+			return hex_lines;
+		}
+		if (obj1_is_json == false) {
+		const xhex_lines = bos_xxd_builtin(xdata)
+                console.log("hexdump: \n" + xhex_lines.join('\n') + 
+                  '\n');
+		}
+            }
         }
     });
 

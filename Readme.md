@@ -15,6 +15,7 @@ This is a prototype for chat server written by nodejs in server side, nodejs cli
 ## install
 
 ```
+  environment node 18.20
   cd src
 
   npm install
